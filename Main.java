@@ -22,7 +22,7 @@ public class Main {
 
     //Deductions Computation
     public static double computeDed(double monthlyGP, int monthHours, int dependents) {
-        double sss, pagIbig, philHealth = 120.0, tax;
+        double sss, pagIbig, philHealth, tax;
 
         // SSS
         if(monthlyGP <= 5000) {
@@ -54,7 +54,11 @@ public class Main {
         }
 
         //PhilHealth
-        if(monthHours < 10) philHealth = 0.0;
+        if(monthHours < 10) {
+            philHealth = 0.0;
+        } else {
+            philHealth = 120.0;
+        }
 
         //Dependents
         double dependDed = dependents * 1000;
