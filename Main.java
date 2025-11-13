@@ -2,81 +2,144 @@ import java.util.Scanner;
 
 public class Main {
 
-    //Overtime Checker
-    public static int checkOvertime(int hours){
-        int overtimeHours = 0;
-        if (hours > 40) overtimeHours = hours - 40;
+    // Payroll Constants
+    private static final int STANDARD_WORK_HOURS_PER_WEEK = 40;
+    private static final double OVERTIME_MULTIPLIER = 1.25;
+    private static final int WEEKS_IN_MONTH = 4;
 
+    // SSS (Social Security System) Constants
+    private static final double SSS_TIER1_THRESHOLD = 5000.0;
+    private static final double SSS_TIER1_FIXED = 105.0;
+    private static final double SSS_TIER2_THRESHOLD = 10000.0;
+    private static final double SSS_TIER2_RATE = 0.05;
+    private static final double SSS_TIER3_THRESHOLD = 15000.0;
+    private static final double SSS_TIER3_RATE = 0.08;
+    private static final double SSS_TIER3_FIXED = 75.0;
+    private static final double SSS_TIER4_RATE = 0.12;
+    private static final double SSS_TIER4_FIXED = 110.0;
+
+    // Pag-IBIG (Home Development Mutual Fund) Constants
+    private static final double PAG_IBIG_RATE = 0.03;
+    private static final double PAG_IBIG_MINIMUM = 100.0;
+
+    // PhilHealth Constants
+    private static final int PHILHEALTH_MINIMUM_HOURS = 10;
+    private static final double PHILHEALTH_CONTRIBUTION = 120.0;
+
+    // Tax Constants
+    private static final double TAX_TIER1_THRESHOLD = 10000.0;
+    private static final double TAX_TIER1_RATE = 0.03;
+    private static final double TAX_TIER2_THRESHOLD = 25000.0;
+    private static final double TAX_TIER2_RATE = 0.08;
+    private static final double TAX_TIER3_THRESHOLD = 40000.0;
+    private static final double TAX_TIER3_RATE = 0.11;
+    private static final double TAX_TIER4_RATE = 0.135;
+
+    // Dependents and Position Constants
+    private static final double DEDUCTION_PER_DEPENDENT = 1000.0;
+    private static final double MANAGER_WEEKLY_BONUS = 5000.0;
+    private static final String MANAGER_POSITION = "manager";
+
+    //Overtime Checker
+    public static int checkOvertime(int hoursWorked){
+        int overtimeHours = 0;
+        if (hoursWorked > STANDARD_WORK_HOURS_PER_WEEK) {
+            overtimeHours = hoursWorked - STANDARD_WORK_HOURS_PER_WEEK;
+        }
         return overtimeHours;
     }
 
 
     //Weekly Gross Pay
-    public static double computeGP(double ratePerHour, int hours, int overtimeHours){
-        double basePay = ratePerHour * (hours - overtimeHours);
-        double overtimePay = overtimeHours * (ratePerHour * 1.25);
+    public static double computeWeeklyGrossPay(double ratePerHour, int hoursWorked, int overtimeHours){
+        double regularHours = hoursWorked - overtimeHours;
+        double basePay = ratePerHour * regularHours;
+        double overtimePay = overtimeHours * (ratePerHour * OVERTIME_MULTIPLIER);
 
         return basePay + overtimePay;
     }
 
 
+    // SSS Contribution Calculation
+    private static double calculateSSSContribution(double monthlyGrossPay) {
+        if (monthlyGrossPay <= SSS_TIER1_THRESHOLD) {
+            return SSS_TIER1_FIXED;
+        }
+        if (monthlyGrossPay <= SSS_TIER2_THRESHOLD) {
+            return monthlyGrossPay * SSS_TIER2_RATE;
+        }
+        if (monthlyGrossPay <= SSS_TIER3_THRESHOLD) {
+            return (monthlyGrossPay * SSS_TIER3_RATE) + SSS_TIER3_FIXED;
+        }
+        return (monthlyGrossPay * SSS_TIER4_RATE) + SSS_TIER4_FIXED;
+    }
+
+    // Pag-IBIG Contribution Calculation
+    private static double calculatePagIbigContribution(double monthlyGrossPay) {
+        if (monthlyGrossPay <= SSS_TIER1_THRESHOLD) {
+            return PAG_IBIG_MINIMUM;
+        }
+        return monthlyGrossPay * PAG_IBIG_RATE;
+    }
+
+    // PhilHealth Contribution Calculation
+    private static double calculatePhilHealthContribution(int monthlyHours) {
+        if (monthlyHours >= PHILHEALTH_MINIMUM_HOURS) {
+            return PHILHEALTH_CONTRIBUTION;
+        }
+        return 0.0;
+    }
+
+    // Withholding Tax Calculation
+    private static double calculateWithholdingTax(double monthlyGrossPay) {
+        if (monthlyGrossPay <= TAX_TIER1_THRESHOLD) {
+            return monthlyGrossPay * TAX_TIER1_RATE;
+        }
+        if (monthlyGrossPay <= TAX_TIER2_THRESHOLD) {
+            return monthlyGrossPay * TAX_TIER2_RATE;
+        }
+        if (monthlyGrossPay <= TAX_TIER3_THRESHOLD) {
+            return monthlyGrossPay * TAX_TIER3_RATE;
+        }
+        return monthlyGrossPay * TAX_TIER4_RATE;
+    }
+
+    // Dependents Deduction Calculation
+    private static double calculateDependentsDeduction(int numberOfDependents) {
+        return numberOfDependents * DEDUCTION_PER_DEPENDENT;
+    }
+
     //Deductions Computation
-    public static double computeDed(double monthlyGP, int monthHours, int dependents) {
-        double sss = 0, pagIbig = (monthlyGP * 0.03), philHealth = 0, tax = 0;
+    public static double computeMonthlyDeductions(double monthlyGrossPay, int monthlyHours, int numberOfDependents) {
+        double sssContribution = calculateSSSContribution(monthlyGrossPay);
+        double pagIbigContribution = calculatePagIbigContribution(monthlyGrossPay);
+        double philHealthContribution = calculatePhilHealthContribution(monthlyHours);
+        double withholdingTax = calculateWithholdingTax(monthlyGrossPay);
+        double dependentsDeduction = calculateDependentsDeduction(numberOfDependents);
 
-        // SSS and PagIbig
-        if(monthlyGP <= 5000) {
-            sss = 105.0;
-            pagIbig = 100.0;
-        } else if(monthlyGP <= 10000) {
-            sss = monthlyGP * 0.05;
-        } else if(monthlyGP <= 15000) {
-            sss = (monthlyGP * 0.08) + 75;
-        } else {
-            sss = (monthlyGP * 0.12) + 110;
-        }
-
-        // Tax
-        if(monthlyGP <= 10000) {
-            tax = monthlyGP * 0.03;
-        } else if(monthlyGP <= 25000) {
-            tax = monthlyGP * 0.08;
-        } else if(monthlyGP <= 40000) {
-            tax = monthlyGP * 0.11;
-        } else {
-            tax = monthlyGP * 0.135;
-        }
-
-        //PhilHealth
-        if(monthHours >= 10) philHealth = 120.0;
-
-
-        //Dependents
-        double dependDed = dependents * 1000;
-
-        //Deductions
-        double deductions = sss + pagIbig + philHealth + tax + dependDed;
-
-        return deductions;
+        return sssContribution + pagIbigContribution + philHealthContribution + withholdingTax + dependentsDeduction;
     }
 
 
     //Net Pay Computation
-    public static double computeNP(double grossPay, String position, double deductions, int weeksInMonth) {
-        double netPay = grossPay - deductions;
+    public static double computeMonthlyNetPay(double monthlyGrossPay, String employeePosition, double totalDeductions, int weeksInMonth) {
+        double netPay = monthlyGrossPay - totalDeductions;
 
-        if (position.equalsIgnoreCase("manager")) netPay += (5000.0 * weeksInMonth);
+        if (employeePosition.equalsIgnoreCase(MANAGER_POSITION)) {
+            double managerBonus = MANAGER_WEEKLY_BONUS * weeksInMonth;
+            netPay += managerBonus;
+        }
         return netPay;
     }
 
-    public static boolean tryAgain(Scanner sc){
-        sc.nextLine();
+    public static boolean tryAgain(Scanner scanner){
+        scanner.nextLine();
         while (true) {
             System.out.print("Do you want to try again? Y/N: ");
-            String choice = sc.nextLine();
-            if (choice.equalsIgnoreCase("y")){
+            String userChoice = scanner.nextLine();
+            if (userChoice.equalsIgnoreCase("y")){
                 return true;
-            } else if (choice.equalsIgnoreCase("n")){
+            } else if (userChoice.equalsIgnoreCase("n")){
                 System.out.println("\nPay Roll Computation Ended. Thank you for using!");
                 return false;
             } else {
@@ -86,50 +149,50 @@ public class Main {
     }
 
     public static void main(String[]args){
-        Scanner sc = new Scanner (System.in);
+        Scanner scanner = new Scanner (System.in);
 
         do {
             System.out.println("\n====================================");
             System.out.println("EMPLOYEE PAY ROLL COMPUTATION");
             System.out.println("====================================");
             System.out.print("\nFirst Name: ");
-            String firstName = sc.nextLine();
+            String firstName = scanner.nextLine();
             System.out.print("Middle Name: ");
-            String middleName = sc.nextLine();
+            String middleName = scanner.nextLine();
             System.out.print("Last Name: ");
-            String lastName = sc.nextLine();
+            String lastName = scanner.nextLine();
             System.out.print("Department: ");
-            String dept = sc.nextLine();
+            String department = scanner.nextLine();
             System.out.print("Position: ");
-            String position = sc.nextLine();
+            String position = scanner.nextLine();
             System.out.print("Rate per Hour: ₱");
-            double ratePerHour = sc.nextDouble();
-            sc.nextLine();
+            double ratePerHour = scanner.nextDouble();
+            scanner.nextLine();
             System.out.print("Dependents: ");
-            int dependents = sc.nextInt();
-            sc.nextLine();
+            int numberOfDependents = scanner.nextInt();
+            scanner.nextLine();
 
-            int weeksInMonth = 4;
-            int monthHours = 0, totalOtHours = 0;
-            double monthGP = 0;
-            int[] hours = new int[weeksInMonth];
-            int[] overtimeHours = new int[weeksInMonth];
-            double[] weekGP = new double[weeksInMonth];
+            int monthlyTotalHours = 0;
+            int monthlyTotalOvertimeHours = 0;
+            double monthlyGrossPay = 0;
+            int[] weeklyHours = new int[WEEKS_IN_MONTH];
+            int[] weeklyOvertimeHours = new int[WEEKS_IN_MONTH];
+            double[] weeklyGrossPay = new double[WEEKS_IN_MONTH];
 
             System.out.println("Enter hours worked per week:");
-            for(int i = 0; i < weeksInMonth; i++) {
-                System.out.print("Week " + (i+1) + ": ");
-                hours[i] = sc.nextInt();
-                overtimeHours[i] = checkOvertime(hours[i]);
-                weekGP[i] = computeGP(ratePerHour, hours[i], overtimeHours[i]);
+            for(int weekIndex = 0; weekIndex < WEEKS_IN_MONTH; weekIndex++) {
+                System.out.print("Week " + (weekIndex + 1) + ": ");
+                weeklyHours[weekIndex] = scanner.nextInt();
+                weeklyOvertimeHours[weekIndex] = checkOvertime(weeklyHours[weekIndex]);
+                weeklyGrossPay[weekIndex] = computeWeeklyGrossPay(ratePerHour, weeklyHours[weekIndex], weeklyOvertimeHours[weekIndex]);
 
-                monthGP += weekGP[i];
-                monthHours += hours[i];
-                totalOtHours += overtimeHours[i];
+                monthlyGrossPay += weeklyGrossPay[weekIndex];
+                monthlyTotalHours += weeklyHours[weekIndex];
+                monthlyTotalOvertimeHours += weeklyOvertimeHours[weekIndex];
             }
 
-            double totalDed = computeDed(monthGP, monthHours, dependents);
-            double netPay = computeNP(monthGP, position, totalDed, weeksInMonth);
+            double totalDeductions = computeMonthlyDeductions(monthlyGrossPay, monthlyTotalHours, numberOfDependents);
+            double netPay = computeMonthlyNetPay(monthlyGrossPay, position, totalDeductions, WEEKS_IN_MONTH);
 
             System.out.println("\n====================================");
             System.out.println("EMPLOYEE PAY SLIP SUMMARY");
@@ -137,24 +200,24 @@ public class Main {
             System.out.println("Employee Information");
             System.out.println("-----------------------------------");
             System.out.printf("%-25s : %s %s %s%n", "Name", firstName, middleName, lastName);
-            System.out.printf("%-25s : %s%n", "Department", dept);
+            System.out.printf("%-25s : %s%n", "Department", department);
             System.out.printf("%-25s : %s%n", "Position", position);
             System.out.println("-----------------------------------");
             System.out.println("Details of Salary Computation");
             System.out.println("-----------------------------------");
             System.out.printf("%-25s : ₱%,.2f%n", "Rate per Hour", ratePerHour);
-            System.out.printf("%-25s : %d%n", "Dependents", dependents);
-            System.out.printf("%-25s : %d%n", "Hours Worked (Month)", monthHours);
-            System.out.printf("%-25s : %d%n", "Overtime Hours", totalOtHours);
-            System.out.printf("%-25s : ₱%,.2f%n", "Deductions", totalDed);
+            System.out.printf("%-25s : %d%n", "Dependents", numberOfDependents);
+            System.out.printf("%-25s : %d%n", "Hours Worked (Month)", monthlyTotalHours);
+            System.out.printf("%-25s : %d%n", "Overtime Hours", monthlyTotalOvertimeHours);
+            System.out.printf("%-25s : ₱%,.2f%n", "Deductions", totalDeductions);
             System.out.println("-----------------------------------");
             System.out.println("Total Pay");
             System.out.println("-----------------------------------");
-            System.out.printf("%-25s : ₱%,.2f%n", "Gross Pay", monthGP);
+            System.out.printf("%-25s : ₱%,.2f%n", "Gross Pay", monthlyGrossPay);
             System.out.printf("%-25s : ₱%,.2f%n", "Net Pay", netPay);
             System.out.println("====================================");
 
-        } while (tryAgain(sc));
-        sc.close();
+        } while (tryAgain(scanner));
+        scanner.close();
     }
 }
