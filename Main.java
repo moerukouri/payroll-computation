@@ -22,18 +22,24 @@ public class Main {
 
     //Deductions Computation
     public static double computeDed(double monthlyGP, int monthHours, int dependents) {
-        double sss, pagIbig = (monthlyGP * 0.03), philHealth = 0, tax;
+        double sss, pagIbig, philHealth = 120.0, tax;
 
-        // SSS and pagIbig
+        // SSS
         if(monthlyGP <= 5000) {
             sss = 105.0;
-            pagIbig = 100.0;
         } else if(monthlyGP <= 10000) {
             sss = monthlyGP * 0.05;
         } else if(monthlyGP <= 15000) {
             sss = (monthlyGP * 0.08) + 75;
         } else {
             sss = (monthlyGP * 0.12) + 110;
+        }
+
+        // PagIbig
+        if(monthlyGP <= 5000) {
+            pagIbig = 100.0;
+        } else {
+            pagIbig = monthlyGP * 0.03;
         }
 
         // Tax
@@ -48,8 +54,7 @@ public class Main {
         }
 
         //PhilHealth
-        if(monthHours >= 10) philHealth = 120.0;
-
+        if(monthHours < 10) philHealth = 0.0;
 
         //Dependents
         double dependDed = dependents * 1000;
@@ -67,6 +72,7 @@ public class Main {
         return netPay;
     }
 
+    //Retry Prompt
     public static boolean tryAgain(Scanner sc){
         sc.nextLine();
         while (true) {
@@ -83,6 +89,8 @@ public class Main {
         }
     }
 
+
+    //Main function
     public static void main(String[]args){
         Scanner sc = new Scanner (System.in);
 
@@ -90,6 +98,8 @@ public class Main {
             System.out.println("\n====================================");
             System.out.println("EMPLOYEE PAY ROLL COMPUTATION");
             System.out.println("====================================");
+
+            //Employee Information Input
             System.out.print("\nFirst Name: ");
             String firstName = sc.nextLine();
             System.out.print("Middle Name: ");
@@ -107,8 +117,8 @@ public class Main {
             int dependents = sc.nextInt();
             sc.nextLine();
 
-            int weeksInMonth = 4;
-            int monthHours = 0, totalOtHours = 0;
+            //Variables
+            int weeksInMonth = 4, monthHours = 0, totalOtHours = 0;
             double monthGP = 0;
             int[] hours = new int[weeksInMonth];
             int[] overtimeHours = new int[weeksInMonth];
@@ -129,6 +139,7 @@ public class Main {
             double totalDed = computeDed(monthGP, monthHours, dependents);
             double netPay = computeNP(monthGP, position, totalDed, weeksInMonth);
 
+            //Pay Slip Output
             System.out.println("\n====================================");
             System.out.println("EMPLOYEE PAY SLIP SUMMARY");
             System.out.println("====================================");
