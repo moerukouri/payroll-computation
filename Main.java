@@ -22,9 +22,9 @@ public class Main {
 
     //Deductions Computation
     public static double computeDed(double monthlyGP, int monthHours, int dependents) {
-        double sss = 0, pagIbig = (monthlyGP * 0.03), philHealth = 0, tax = 0;
+        double sss, pagIbig = (monthlyGP * 0.03), philHealth = 0, tax;
 
-        // SSS and PagIbig
+        // SSS and pagIbig
         if(monthlyGP <= 5000) {
             sss = 105.0;
             pagIbig = 100.0;
@@ -55,9 +55,7 @@ public class Main {
         double dependDed = dependents * 1000;
 
         //Deductions
-        double deductions = sss + pagIbig + philHealth + tax + dependDed;
-
-        return deductions;
+        return sss + pagIbig + philHealth + tax + dependDed;
     }
 
 
@@ -102,7 +100,7 @@ public class Main {
             String dept = sc.nextLine();
             System.out.print("Position: ");
             String position = sc.nextLine();
-            System.out.print("Rate per Hour: ₱");
+            System.out.print("Rate per Hour: ₱ ");
             double ratePerHour = sc.nextDouble();
             sc.nextLine();
             System.out.print("Dependents: ");
@@ -142,16 +140,16 @@ public class Main {
             System.out.println("-----------------------------------");
             System.out.println("Details of Salary Computation");
             System.out.println("-----------------------------------");
-            System.out.printf("%-25s : ₱%,.2f%n", "Rate per Hour", ratePerHour);
+            System.out.printf("%-25s : ₱ %,.2f%n", "Rate per Hour", ratePerHour);
             System.out.printf("%-25s : %d%n", "Dependents", dependents);
             System.out.printf("%-25s : %d%n", "Hours Worked (Month)", monthHours);
             System.out.printf("%-25s : %d%n", "Overtime Hours", totalOtHours);
-            System.out.printf("%-25s : ₱%,.2f%n", "Deductions", totalDed);
+            System.out.printf("%-25s : ₱ %,.2f%n", "Deductions", totalDed);
             System.out.println("-----------------------------------");
             System.out.println("Total Pay");
             System.out.println("-----------------------------------");
-            System.out.printf("%-25s : ₱%,.2f%n", "Gross Pay", monthGP);
-            System.out.printf("%-25s : ₱%,.2f%n", "Net Pay", netPay);
+            System.out.printf("%-25s : ₱ %,.2f%n", "Gross Pay", monthGP);
+            System.out.printf("%-25s : ₱ %,.2f%n", "Net Pay", netPay);
             System.out.println("====================================");
 
         } while (tryAgain(sc));
