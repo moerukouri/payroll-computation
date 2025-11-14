@@ -117,7 +117,7 @@ public class Main {
         int weeksInMonth = 4, monthlyHours = 0, totalOtHours = 0;
         double monthGP = 0;
         int[] hours = new int[weeksInMonth];
-        int[] overtimeHours = new int[weeksInMonth];
+        int[] weekOtHours = new int[weeksInMonth];
         double[] weekGP = new double[weeksInMonth];
 
         do {
@@ -147,12 +147,12 @@ public class Main {
             for(int i = 0; i < weeksInMonth; i++) {
                 System.out.print("Week " + (i+1) + ": ");
                 hours[i] = sc.nextInt();
-                overtimeHours[i] = checkOvertime(hours[i]);
-                weekGP[i] = computeGP(ratePerHour, hours[i], overtimeHours[i]);
+                weekOtHours[i] = checkOvertime(hours[i]);
+                weekGP[i] = computeGP(ratePerHour, hours[i], weekOtHours[i]);
 
                 monthGP += weekGP[i];
                 monthlyHours += hours[i];
-                totalOtHours += overtimeHours[i];
+                totalOtHours += weekOtHours[i];
             }
 
             double totalDed = computeDed(monthGP, monthlyHours, nDependents);
