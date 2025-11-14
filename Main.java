@@ -23,12 +23,13 @@ public class Main {
     public static double computeSSS(double monthlyGP){
         if(monthlyGP <= 5000) {
             return 105.0;
-        } if(monthlyGP <= 10000) {
+        } else if(monthlyGP <= 10000) {
             return monthlyGP * 0.05;
-        } if(monthlyGP <= 15000) {
+        } else if(monthlyGP <= 15000) {
             return (monthlyGP * 0.08) + 75;
+        } else {
+            return (monthlyGP * 0.12) + 110;
         }
-        return (monthlyGP * 0.12) + 110;
     }
 
     //PagIbig Computation
@@ -57,8 +58,9 @@ public class Main {
     public static double computePhilHealth(double monthHours){
         if(monthHours < 10) {
             return 0.0;
+        } else {
+            return 120.0;
         }
-        return 120.0;
     }
     public static double computeDependents(int dependents){
         return dependents * 1000;
