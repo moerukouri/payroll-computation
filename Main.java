@@ -55,15 +55,15 @@ public class Main {
     }
 
     //PhilHealth Computation
-    public static double computePhilHealth(double monthlyHours){
+    public static double computePhilHealth(int monthlyHours){
         if(monthlyHours < 10) {
             return 0.0;
         } else {
             return 120.0;
         }
     }
-    public static double computeDependents(int dependents){
-        return dependents * 1000;
+    public static double computeDependents(int nDependents){
+        return nDependents * 1000;
     }
 
     //Deductions Computation
