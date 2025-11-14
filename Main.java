@@ -19,52 +19,61 @@ public class Main {
         return basePay + overtimePay;
     }
 
+    //SSS Computation
+    public static double computeSSS(double monthlyGP){
+        if(monthlyGP <= 5000) {
+            return 105.0;
+        } if(monthlyGP <= 10000) {
+            return monthlyGP * 0.05;
+        } if(monthlyGP <= 15000) {
+            return (monthlyGP * 0.08) + 75;
+        }
+        return (monthlyGP * 0.12) + 110;
+    }
+
+    //PagIbig Computation
+    public static double computePagIbig(double monthlyGP){
+        if(monthlyGP <= 5000) {
+            return 100.0;
+        } else {
+            return monthlyGP * 0.03;
+        }
+    }
+
+    //Tax Computation
+    public static double computeTax(double monthlyGP){
+        if(monthlyGP <= 10000) {
+            return monthlyGP * 0.03;
+        } else if(monthlyGP <= 25000) {
+            return monthlyGP * 0.08;
+        } else if(monthlyGP <= 40000) {
+            return monthlyGP * 0.11;
+        } else {
+            return monthlyGP * 0.135;
+        }
+    }
+
+    //PhilHealth Computation
+    public static double computePhilHealth(double monthHours){
+        if(monthHours < 10) {
+            return 0.0;
+        }
+        return 120.0;
+    }
+    public static double computeDependents(int dependents){
+        return dependents * 1000;
+    }
 
     //Deductions Computation
     public static double computeDed(double monthlyGP, int monthHours, int dependents) {
-        double sss, pagIbig, philHealth, tax;
-
-        // SSS
-        if(monthlyGP <= 5000) {
-            sss = 105.0;
-        } else if(monthlyGP <= 10000) {
-            sss = monthlyGP * 0.05;
-        } else if(monthlyGP <= 15000) {
-            sss = (monthlyGP * 0.08) + 75;
-        } else {
-            sss = (monthlyGP * 0.12) + 110;
-        }
-
-        // PagIbig
-        if(monthlyGP <= 5000) {
-            pagIbig = 100.0;
-        } else {
-            pagIbig = monthlyGP * 0.03;
-        }
-
-        // Tax
-        if(monthlyGP <= 10000) {
-            tax = monthlyGP * 0.03;
-        } else if(monthlyGP <= 25000) {
-            tax = monthlyGP * 0.08;
-        } else if(monthlyGP <= 40000) {
-            tax = monthlyGP * 0.11;
-        } else {
-            tax = monthlyGP * 0.135;
-        }
-
-        //PhilHealth
-        if(monthHours < 10) {
-            philHealth = 0.0;
-        } else {
-            philHealth = 120.0;
-        }
-
-        //Dependents
-        double dependDed = dependents * 1000;
+        double sssDeduction = computeSSS(monthlyGP);
+        double pagIbigDeduction = computePagIbig(monthlyGP);
+        double philHealthDeduction = computePhilHealth(monthHours);
+        double taxDeduction = computeTax(monthlyGP);
+        double dependentsDeduction = computeDependents(dependents);
 
         //Deductions
-        return sss + pagIbig + philHealth + tax + dependDed;
+        return sssDeduction + pagIbigDeduction + philHealthDeduction + taxDeduction + dependentsDeduction;
     }
 
 
@@ -79,24 +88,35 @@ public class Main {
     //Retry Prompt
     public static boolean tryAgain(Scanner sc){
         sc.nextLine();
-        while (true) {
+        boolean retry = true;
+        boolean isValidInput;
+        do {
             System.out.print("Do you want to try again? Y/N: ");
             String choice = sc.nextLine();
             if (choice.equalsIgnoreCase("y")){
-                return true;
+                isValidInput = true;
             } else if (choice.equalsIgnoreCase("n")){
-                System.out.println("\nPay Roll Computation Ended. Thank you for using!");
-                return false;
+                System.out.println("\nPay Roll Computation ended. Thank you for using!");
+                retry = false;
+                isValidInput = true;
             } else {
                 System.out.println("That is not a valid input.");
+                isValidInput = false;
             }
-        }
+        } while (!isValidInput);
+        return retry;
     }
 
 
     //Main function
     public static void main(String[]args){
         Scanner sc = new Scanner (System.in);
+        //Variables
+        int weeksInMonth = 4, monthHours = 0, totalOtHours = 0;
+        double monthGP = 0;
+        int[] hours = new int[weeksInMonth];
+        int[] overtimeHours = new int[weeksInMonth];
+        double[] weekGP = new double[weeksInMonth];
 
         do {
             System.out.println("\n====================================");
@@ -120,13 +140,6 @@ public class Main {
             System.out.print("Dependents: ");
             int dependents = sc.nextInt();
             sc.nextLine();
-
-            //Variables
-            int weeksInMonth = 4, monthHours = 0, totalOtHours = 0;
-            double monthGP = 0;
-            int[] hours = new int[weeksInMonth];
-            int[] overtimeHours = new int[weeksInMonth];
-            double[] weekGP = new double[weeksInMonth];
 
             System.out.println("Enter hours worked per week:");
             for(int i = 0; i < weeksInMonth; i++) {
