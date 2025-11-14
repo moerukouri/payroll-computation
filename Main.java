@@ -55,8 +55,8 @@ public class Main {
     }
 
     //PhilHealth Computation
-    public static double computePhilHealth(double monthHours){
-        if(monthHours < 10) {
+    public static double computePhilHealth(double monthlyHours){
+        if(monthlyHours < 10) {
             return 0.0;
         } else {
             return 120.0;
@@ -67,10 +67,10 @@ public class Main {
     }
 
     //Deductions Computation
-    public static double computeDed(double monthlyGP, int monthHours, int dependents) {
+    public static double computeDed(double monthlyGP, int monthlyHours, int dependents) {
         double sssDeduction = computeSSS(monthlyGP);
         double pagIbigDeduction = computePagIbig(monthlyGP);
-        double philHealthDeduction = computePhilHealth(monthHours);
+        double philHealthDeduction = computePhilHealth(monthlyHours);
         double taxDeduction = computeTax(monthlyGP);
         double dependentsDeduction = computeDependents(dependents);
 
@@ -114,7 +114,7 @@ public class Main {
     public static void main(String[]args){
         Scanner sc = new Scanner (System.in);
         //Variables
-        int weeksInMonth = 4, monthHours = 0, totalOtHours = 0;
+        int weeksInMonth = 4, monthlyHours = 0, totalOtHours = 0;
         double monthGP = 0;
         int[] hours = new int[weeksInMonth];
         int[] overtimeHours = new int[weeksInMonth];
@@ -140,7 +140,7 @@ public class Main {
             double ratePerHour = sc.nextDouble();
             sc.nextLine();
             System.out.print("Dependents: ");
-            int dependents = sc.nextInt();
+            int nDependents = sc.nextInt();
             sc.nextLine();
 
             System.out.println("Enter hours worked per week:");
@@ -151,11 +151,11 @@ public class Main {
                 weekGP[i] = computeGP(ratePerHour, hours[i], overtimeHours[i]);
 
                 monthGP += weekGP[i];
-                monthHours += hours[i];
+                monthlyHours += hours[i];
                 totalOtHours += overtimeHours[i];
             }
 
-            double totalDed = computeDed(monthGP, monthHours, dependents);
+            double totalDed = computeDed(monthGP, monthlyHours, nDependents);
             double netPay = computeNP(monthGP, position, totalDed, weeksInMonth);
 
             //Pay Slip Output
@@ -171,8 +171,8 @@ public class Main {
             System.out.println("Details of Salary Computation");
             System.out.println("-----------------------------------");
             System.out.printf("%-25s : ₱ %,.2f%n", "Rate per Hour", ratePerHour);
-            System.out.printf("%-25s : %d%n", "Dependents", dependents);
-            System.out.printf("%-25s : %d%n", "Hours Worked (Month)", monthHours);
+            System.out.printf("%-25s : %d%n", "Dependents", nDependents);
+            System.out.printf("%-25s : %d%n", "Hours Worked (Month)", monthlyHours);
             System.out.printf("%-25s : %d%n", "Overtime Hours", totalOtHours);
             System.out.printf("%-25s : ₱ %,.2f%n", "Deductions", totalDed);
             System.out.println("-----------------------------------");
