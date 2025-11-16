@@ -150,9 +150,9 @@ public class Main {
                 weekOtHours[i] = checkOvertime(weekHours[i]);
                 weekGP[i] = computeGP(ratePerHour, weekHours[i], weekOtHours[i]);
 
-                monthGP += weekGP[i];
                 monthlyHours += weekHours[i];
                 totalOtHours += weekOtHours[i];
+                monthGP += weekGP[i];
             }
 
             double totalDed = computeDed(monthGP, monthlyHours, nDependents);
