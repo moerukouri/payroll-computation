@@ -82,8 +82,8 @@ public class Main {
     //Net Pay Computation
     public static double computeNP(double grossPay, String position, double deductions, int weeksInMonth) {
         double netPay = grossPay - deductions;
-
         if (position.equalsIgnoreCase("manager")) netPay += (5000.0 * weeksInMonth);
+
         return netPay;
     }
 
@@ -115,7 +115,7 @@ public class Main {
         Scanner sc = new Scanner (System.in);
         //Variables
         int weeksInMonth = 4, monthlyHours = 0, totalOtHours = 0;
-        double monthGP = 0;
+        double monthlyGP = 0;
         int[] weekHours = new int[weeksInMonth];
         int[] weekOtHours = new int[weeksInMonth];
         double[] weekGP = new double[weeksInMonth];
@@ -152,11 +152,11 @@ public class Main {
 
                 monthlyHours += weekHours[i];
                 totalOtHours += weekOtHours[i];
-                monthGP += weekGP[i];
+                monthlyGP += weekGP[i];
             }
 
-            double totalDed = computeDed(monthGP, monthlyHours, nDependents);
-            double netPay = computeNP(monthGP, position, totalDed, weeksInMonth);
+            double totalDed = computeDed(monthlyGP, monthlyHours, nDependents);
+            double netPay = computeNP(monthlyGP, position, totalDed, weeksInMonth);
 
             //Pay Slip Output
             System.out.println("\n====================================");
@@ -178,7 +178,7 @@ public class Main {
             System.out.println("-----------------------------------");
             System.out.println("Total Pay");
             System.out.println("-----------------------------------");
-            System.out.printf("%-25s : ₱ %,.2f%n", "Gross Pay", monthGP);
+            System.out.printf("%-25s : ₱ %,.2f%n", "Gross Pay", monthlyGP);
             System.out.printf("%-25s : ₱ %,.2f%n", "Net Pay", netPay);
             System.out.println("====================================");
 
