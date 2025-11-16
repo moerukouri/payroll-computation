@@ -3,17 +3,17 @@ import java.util.Scanner;
 public class Main {
 
     //Overtime Checker
-    public static int checkOvertime(int hours){
+    public static int checkOvertime(int weekHours){
         int overtimeHours = 0;
-        if (hours > 40) overtimeHours = hours - 40;
+        if (weekHours > 40) overtimeHours = weekHours - 40;
 
         return overtimeHours;
     }
 
 
     //Weekly Gross Pay
-    public static double computeGP(double ratePerHour, int hours, int overtimeHours){
-        double basePay = ratePerHour * (hours - overtimeHours);
+    public static double computeGP(double ratePerHour, int weekHours, int overtimeHours){
+        double basePay = ratePerHour * (weekHours - overtimeHours);
         double overtimePay = overtimeHours * (ratePerHour * 1.25);
 
         return basePay + overtimePay;
@@ -116,7 +116,7 @@ public class Main {
         //Variables
         int weeksInMonth = 4, monthlyHours = 0, totalOtHours = 0;
         double monthGP = 0;
-        int[] hours = new int[weeksInMonth];
+        int[] weekHours = new int[weeksInMonth];
         int[] weekOtHours = new int[weeksInMonth];
         double[] weekGP = new double[weeksInMonth];
 
@@ -133,7 +133,7 @@ public class Main {
             System.out.print("Last Name: ");
             String lastName = sc.nextLine();
             System.out.print("Department: ");
-            String dept = sc.nextLine();
+            String department = sc.nextLine();
             System.out.print("Position: ");
             String position = sc.nextLine();
             System.out.print("Rate per Hour: ₱ ");
@@ -146,12 +146,12 @@ public class Main {
             System.out.println("Enter hours worked per week:");
             for(int i = 0; i < weeksInMonth; i++) {
                 System.out.print("Week " + (i+1) + ": ");
-                hours[i] = sc.nextInt();
-                weekOtHours[i] = checkOvertime(hours[i]);
-                weekGP[i] = computeGP(ratePerHour, hours[i], weekOtHours[i]);
+                weekHours[i] = sc.nextInt();
+                weekOtHours[i] = checkOvertime(weekHours[i]);
+                weekGP[i] = computeGP(ratePerHour, weekHours[i], weekOtHours[i]);
 
                 monthGP += weekGP[i];
-                monthlyHours += hours[i];
+                monthlyHours += weekHours[i];
                 totalOtHours += weekOtHours[i];
             }
 
@@ -165,7 +165,7 @@ public class Main {
             System.out.println("Employee Information");
             System.out.println("-----------------------------------");
             System.out.printf("%-25s : %s %s %s%n", "Name", firstName, middleName, lastName);
-            System.out.printf("%-25s : %s%n", "Department", dept);
+            System.out.printf("%-25s : %s%n", "Department", department);
             System.out.printf("%-25s : %s%n", "Position", position);
             System.out.println("-----------------------------------");
             System.out.println("Details of Salary Computation");
