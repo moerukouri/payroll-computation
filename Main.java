@@ -1,6 +1,8 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
+    public static boolean isValidInput;
 
     //Overtime Checker
     public static int checkOvertime(int weekHours){
@@ -91,7 +93,6 @@ public class Main {
     public static boolean tryAgain(Scanner sc){
         sc.nextLine();
         boolean retry = true;
-        boolean isValidInput;
         do {
             System.out.print("Do you want to try again? Y/N: ");
             String choice = sc.nextLine();
@@ -102,11 +103,15 @@ public class Main {
                 retry = false;
                 isValidInput = true;
             } else {
-                System.out.println("That is not a valid input.");
+                invalidNotifier();
                 isValidInput = false;
             }
         } while (!isValidInput);
         return retry;
+    }
+
+    public static void invalidNotifier(){
+        System.out.println("Please enter a valid input.");
     }
 
 
@@ -114,8 +119,8 @@ public class Main {
     public static void main(String[]args){
         Scanner sc = new Scanner (System.in);
         //Variables
-        int weeksInMonth = 4, monthlyHours = 0, totalOtHours = 0;
-        double monthlyGP = 0;
+        int weeksInMonth = 4, monthlyHours = 0, totalOtHours = 0, nDependents = 0;
+        double monthlyGP = 0, ratePerHour = 0;
         int[] weekHours = new int[weeksInMonth];
         int[] weekOtHours = new int[weeksInMonth];
         double[] weekGP = new double[weeksInMonth];
@@ -136,13 +141,30 @@ public class Main {
             String department = sc.nextLine();
             System.out.print("Position: ");
             String position = sc.nextLine();
-            System.out.print("Rate per Hour: ₱ ");
-            double ratePerHour = sc.nextDouble();
-            sc.nextLine();
-            System.out.print("Dependents: ");
-            int nDependents = sc.nextInt();
-            sc.nextLine();
-
+            do {
+                try {
+                    System.out.print("Rate per Hour: ₱ ");
+                    ratePerHour = sc.nextDouble();
+                    sc.nextLine();
+                    break;
+                } catch (InputMismatchException e) {
+                    invalidNotifier();
+                    isValidInput = false;
+                    sc.next();
+                }
+            } while(!isValidInput);
+            do {
+                try {
+                    System.out.print("Dependents: ");
+                    nDependents = sc.nextInt();
+                    sc.nextLine();
+                    break;
+                } catch (InputMismatchException e) {
+                    invalidNotifier();
+                    isValidInput = false;
+                    sc.next();
+                }
+            } while(!isValidInput);
             System.out.println("Enter hours worked per week:");
             for(int i = 0; i < weeksInMonth; i++) {
                 System.out.print("Week " + (i+1) + ": ");
@@ -158,6 +180,7 @@ public class Main {
             double totalDed = computeDed(monthlyGP, monthlyHours, nDependents);
             double netPay = computeNP(monthlyGP, position, totalDed, weeksInMonth);
 
+
             //Pay Slip Output
             System.out.println("\n====================================");
             System.out.println("EMPLOYEE PAY SLIP SUMMARY");
@@ -171,10 +194,18 @@ public class Main {
             System.out.println("Details of Salary Computation");
             System.out.println("-----------------------------------");
             System.out.printf("%-25s : ₱ %,.2f%n", "Rate per Hour", ratePerHour);
-            System.out.printf("%-25s : %d%n", "Dependents", nDependents);
+            System.out.printf("%-25s : %d%n", "Amount of Dependents", nDependents);
             System.out.printf("%-25s : %d%n", "Hours Worked (Month)", monthlyHours);
             System.out.printf("%-25s : %d%n", "Overtime Hours", totalOtHours);
-            System.out.printf("%-25s : ₱ %,.2f%n", "Deductions", totalDed);
+            System.out.println("-----------------------------------");
+            System.out.println("Deductions");
+            System.out.println("-----------------------------------");
+            System.out.printf("%-25s : ₱ %,.2f%n", "SSS", computeSSS(monthlyGP));
+            System.out.printf("%-25s : ₱ %,.2f%n", "Pag-IBIG", computePagIbig(monthlyGP));
+            System.out.printf("%-25s : ₱ %,.2f%n", "Tax", computeTax(monthlyGP));
+            System.out.printf("%-25s : ₱ %,.2f%n", "PhilHealth", computePhilHealth(monthlyHours));
+            System.out.printf("%-25s : ₱ %,.2f%n", "Dependents", computeDependents(nDependents));
+            System.out.printf("%-25s : ₱ %,.2f%n", "Total Deductions", totalDed);
             System.out.println("-----------------------------------");
             System.out.println("Total Pay");
             System.out.println("-----------------------------------");
