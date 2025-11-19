@@ -1,21 +1,22 @@
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
-public class Main {
-    public static boolean isValidInput;
+public class finalCode_c1a_GRP4 {
+    // Class variables
+    public static Scanner sc = new Scanner (System.in);
+    public static boolean isValidInput = true;
 
     //Overtime Checker
     public static int checkOvertime(int weekHours){
-        int overtimeHours = 0;
-        if (weekHours > 40) overtimeHours = weekHours - 40;
-
-        return overtimeHours;
+        if (weekHours > 40) {
+            return weekHours - 40;
+        }
+        return 0;
     }
 
-
     //Weekly Gross Pay
-    public static double computeGP(double ratePerHour, int weekHours, int overtimeHours){
+    public static double computeGP(double ratePerHour, String position, int weekHours, int overtimeHours){
         double basePay = ratePerHour * (weekHours - overtimeHours);
+        if (position.equalsIgnoreCase("manager")) basePay += 5000;
         double overtimePay = overtimeHours * (ratePerHour * 1.25);
 
         return basePay + overtimePay;
@@ -82,15 +83,12 @@ public class Main {
 
 
     //Net Pay Computation
-    public static double computeNP(double grossPay, String position, double deductions, int weeksInMonth) {
-        double netPay = grossPay - deductions;
-        if (position.equalsIgnoreCase("manager")) netPay += (5000.0 * weeksInMonth);
-
-        return netPay;
+    public static double computeNP(double grossPay, double deductions) {
+        return grossPay - deductions;
     }
 
     //Retry Prompt
-    public static boolean tryAgain(Scanner sc){
+    public static boolean tryAgain(){
         sc.nextLine();
         boolean retry = true;
         do {
@@ -103,93 +101,114 @@ public class Main {
                 retry = false;
                 isValidInput = true;
             } else {
-                invalidNotifier();
+                System.out.println("Please enter a valid input.");
                 isValidInput = false;
             }
         } while (!isValidInput);
         return retry;
     }
 
-    public static void invalidNotifier(){
-        System.out.println("Please enter a valid input.");
-    }
-
 
     //Main function
     public static void main(String[]args){
-        Scanner sc = new Scanner (System.in);
-        //Variables
-        int weeksInMonth = 4, monthlyHours = 0, totalOtHours = 0, nDependents = 0;
-        double monthlyGP = 0, ratePerHour = 0;
-        int[] weekHours = new int[weeksInMonth];
-        int[] weekOtHours = new int[weeksInMonth];
-        double[] weekGP = new double[weeksInMonth];
-
         do {
+            String firstName, middleName, lastName, department, position;
+            double ratePerHour = 0, monthlyGP = 0;
+            int nDependents = 0, monthlyHours = 0, totalOtHours = 0;
+            final int weeksInMonth = 4;
+
+            int[] weekHours = new int[weeksInMonth];
+            int[] weekOtHours = new int[weeksInMonth];
+            double[] weekGP = new double[weeksInMonth];
+
+
             System.out.println("\n====================================");
             System.out.println("EMPLOYEE PAY ROLL COMPUTATION");
             System.out.println("====================================");
 
             //Employee Information Input
             System.out.print("\nFirst Name: ");
-            String firstName = sc.nextLine();
+            firstName = sc.nextLine();
             System.out.print("Middle Name: ");
-            String middleName = sc.nextLine();
+            middleName = sc.nextLine();
             System.out.print("Last Name: ");
-            String lastName = sc.nextLine();
+            lastName = sc.nextLine();
             System.out.print("Department: ");
-            String department = sc.nextLine();
+            department = sc.nextLine();
             System.out.print("Position: ");
-            String position = sc.nextLine();
+            position = sc.nextLine();
+            //Rate per hour
             do {
                 try {
                     System.out.print("Rate per Hour: ₱ ");
                     ratePerHour = sc.nextDouble();
-                    sc.nextLine();
-                    break;
+                    if (ratePerHour < 0) throw new InputMismatchException();
+                    isValidInput = true;
                 } catch (InputMismatchException e) {
-                    invalidNotifier();
+                    System.out.println("Please enter a valid input.");
                     isValidInput = false;
-                    sc.next();
+                    sc.nextLine();
                 }
             } while(!isValidInput);
+
+            //Dependents
             do {
                 try {
                     System.out.print("Dependents: ");
                     nDependents = sc.nextInt();
-                    sc.nextLine();
-                    break;
+                    if (nDependents < 0) throw new InputMismatchException();
+                    isValidInput = true;
                 } catch (InputMismatchException e) {
-                    invalidNotifier();
+                    System.out.println("Please enter a valid input.");
                     isValidInput = false;
-                    sc.next();
+                    sc.nextLine();
                 }
             } while(!isValidInput);
+
+            //Weekly calculation
             System.out.println("Enter hours worked per week:");
             for(int i = 0; i < weeksInMonth; i++) {
-                System.out.print("Week " + (i+1) + ": ");
-                weekHours[i] = sc.nextInt();
-                weekOtHours[i] = checkOvertime(weekHours[i]);
-                weekGP[i] = computeGP(ratePerHour, weekHours[i], weekOtHours[i]);
+                do {
+                    try {
+                        System.out.print("Week " + (i + 1) + ": ");
+                        weekHours[i] = sc.nextInt();
+                        if (weekHours[i] < 0 || weekHours[i] > 168) {
+                            isValidInput = false;
+                            System.out.println("Weekly hours cannot go below 0 or over 168.");
+                            continue;
+                        }
+                        break;
+                    } catch (InputMismatchException e) {
+                        System.out.println("Please enter a valid input.");
+                        isValidInput = false;
+                        sc.nextLine();
+                    }
+                } while(!isValidInput);
 
+                weekOtHours[i] = checkOvertime(weekHours[i]);
+                weekGP[i] = computeGP(ratePerHour, position, weekHours[i], weekOtHours[i]);
+
+                //Monthly calculation
                 monthlyHours += weekHours[i];
                 totalOtHours += weekOtHours[i];
                 monthlyGP += weekGP[i];
             }
 
             double totalDed = computeDed(monthlyGP, monthlyHours, nDependents);
-            double netPay = computeNP(monthlyGP, position, totalDed, weeksInMonth);
+            double netPay = computeNP(monthlyGP, totalDed);
 
 
             //Pay Slip Output
             System.out.println("\n====================================");
             System.out.println("EMPLOYEE PAY SLIP SUMMARY");
             System.out.println("====================================");
+
             System.out.println("Employee Information");
             System.out.println("-----------------------------------");
             System.out.printf("%-25s : %s %s %s%n", "Name", firstName, middleName, lastName);
             System.out.printf("%-25s : %s%n", "Department", department);
             System.out.printf("%-25s : %s%n", "Position", position);
+
             System.out.println("-----------------------------------");
             System.out.println("Details of Salary Computation");
             System.out.println("-----------------------------------");
@@ -197,6 +216,7 @@ public class Main {
             System.out.printf("%-25s : %d%n", "Amount of Dependents", nDependents);
             System.out.printf("%-25s : %d%n", "Hours Worked (Month)", monthlyHours);
             System.out.printf("%-25s : %d%n", "Overtime Hours", totalOtHours);
+
             System.out.println("-----------------------------------");
             System.out.println("Deductions");
             System.out.println("-----------------------------------");
@@ -206,6 +226,7 @@ public class Main {
             System.out.printf("%-25s : ₱ %,.2f%n", "PhilHealth", computePhilHealth(monthlyHours));
             System.out.printf("%-25s : ₱ %,.2f%n", "Dependents", computeDependents(nDependents));
             System.out.printf("%-25s : ₱ %,.2f%n", "Total Deductions", totalDed);
+
             System.out.println("-----------------------------------");
             System.out.println("Total Pay");
             System.out.println("-----------------------------------");
@@ -213,7 +234,7 @@ public class Main {
             System.out.printf("%-25s : ₱ %,.2f%n", "Net Pay", netPay);
             System.out.println("====================================");
 
-        } while (tryAgain(sc));
+        } while (tryAgain());
         sc.close();
     }
 }
