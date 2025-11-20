@@ -5,6 +5,23 @@ public class finalCode_c1a_GRP4 {
     public static Scanner sc = new Scanner (System.in);
     public static boolean isValidInput = true;
 
+    //Employee Information
+    public static String employeeInfoPrompt(String info){
+        String infoVar;
+        do {
+            System.out.printf("%s: ", info);
+            infoVar = sc.nextLine();
+            if (infoVar.matches("[a-zA-ZñÑ -]+")) {
+                isValidInput = true;
+            } else {
+                System.out.print("Please enter a valid input.\n");
+                isValidInput = false;
+            }
+        } while(!isValidInput);
+
+        return infoVar;
+    }
+
     //Overtime Checker
     public static int checkOvertime(int weekHours){
         if (weekHours > 40) {
@@ -127,16 +144,11 @@ public class finalCode_c1a_GRP4 {
             System.out.println("====================================");
 
             //Employee Information Input
-            System.out.print("\nFirst Name: ");
-            firstName = sc.nextLine();
-            System.out.print("Middle Name: ");
-            middleName = sc.nextLine();
-            System.out.print("Last Name: ");
-            lastName = sc.nextLine();
-            System.out.print("Department: ");
-            department = sc.nextLine();
-            System.out.print("Position: ");
-            position = sc.nextLine();
+            firstName = employeeInfoPrompt("First Name");
+            middleName = employeeInfoPrompt("Middle Name");
+            lastName = employeeInfoPrompt("Last Name");
+            department = employeeInfoPrompt("Department");
+            position = employeeInfoPrompt("Position");
             //Rate per hour
             do {
                 try {
